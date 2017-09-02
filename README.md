@@ -5,3 +5,6 @@ Staggered List
 
 Day-2
 Parallax View
+
+Day-3
+Multiple Fragments (TabLayout)
