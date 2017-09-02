@@ -7,4 +7,4 @@ Day-2
 Parallax View
 
 Day-3
-Multiple Fragments (TabLayout)
+Multiple Fragments (Detail Fragment)
