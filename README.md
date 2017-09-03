@@ -8,3 +8,6 @@ Parallax View
 
 Day-3
 Multiple Fragments (Detail Fragment)
+
+Day 4
+Facial REcognition using Mobile Vision lib
