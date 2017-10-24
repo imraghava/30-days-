@@ -117,14 +117,25 @@ public class Emojifier {
     public static Emoji whichEmoji(Face thisFace) {
         if (thisFace.getIsSmilingProbability()>SMILING_THRESHOLD){
             smiling = true;
+        }else{
+            smiling = false;
         }
         if(thisFace.getIsLeftEyeOpenProbability()<LEFT_EYE__THRESHOLD ){
             left_eye_closed = true;
+        }else {
+            left_eye_closed = false;
         }
         if(thisFace.getIsRightEyeOpenProbability() < RIGHT_EYE__THRESHOLD){
             right_eye_closed = true;
+        }else {
+            right_eye_closed = false;
         }
-
+        Log.d(LOG_TAG,String.valueOf(thisFace.getIsLeftEyeOpenProbability()));
+        Log.d(LOG_TAG,String.valueOf(thisFace.getIsRightEyeOpenProbability()));
+        Log.d(LOG_TAG,String.valueOf(thisFace.getIsSmilingProbability()));
+        Log.d(LOG_TAG,String.valueOf(smiling));
+        Log.d(LOG_TAG,String.valueOf(left_eye_closed));
+        Log.d(LOG_TAG,String.valueOf(right_eye_closed));
         Emoji emoji = Emoji.smile;
 
         if(smiling){

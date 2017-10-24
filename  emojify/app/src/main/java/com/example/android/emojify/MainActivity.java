@@ -18,10 +18,13 @@ package com.example.android.emojify;
 
 
 import android.Manifest;
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -59,6 +62,8 @@ public class MainActivity extends AppCompatActivity {
 
     private Bitmap mResultsBitmap;
 
+     Context mContext = this;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +84,8 @@ public class MainActivity extends AppCompatActivity {
      *
      * @param view The emojify me button.
      */
+
+
     public void emojifyMe(View view) {
         // Check for the external storage permission
         if (ContextCompat.checkSelfPermission(this,
@@ -92,6 +99,9 @@ public class MainActivity extends AppCompatActivity {
         } else {
             // Launch the camera if the permission exists
             launchCamera();
+            mEmojifyButton.setVisibility(View.GONE);
+            mTitleTextView.setVisibility(View.GONE);
+
         }
     }
 
@@ -105,6 +115,8 @@ public class MainActivity extends AppCompatActivity {
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // If you get permission, launch the camera
                     launchCamera();
+                    mEmojifyButton.setVisibility(View.GONE);
+                    mTitleTextView.setVisibility(View.GONE);
                 } else {
                     // If you do not get permission, show a Toast
                     Toast.makeText(this, R.string.permission_denied, Toast.LENGTH_SHORT).show();
@@ -158,7 +170,8 @@ public class MainActivity extends AppCompatActivity {
         // If the image capture activity was called and was successful
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             // Process the image and set it to the TextView
-            processAndSetImage();
+            MyTask task = new MyTask();
+            task.execute();
         } else {
 
             // Otherwise, delete the temporary image file
@@ -169,24 +182,30 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Method for processing the captured image and setting it to the TextView.
      */
-    private void processAndSetImage() {
+    private class MyTask extends AsyncTask<Void , Void , Bitmap> {
 
-        // Toggle Visibility of the views
-        mEmojifyButton.setVisibility(View.GONE);
-        mTitleTextView.setVisibility(View.GONE);
-        mSaveFab.setVisibility(View.VISIBLE);
-        mShareFab.setVisibility(View.VISIBLE);
-        mClearFab.setVisibility(View.VISIBLE);
+        @Override
+        protected Bitmap doInBackground(Void... voids) {
+            // Resample the saved image to fit the ImageView
+            mResultsBitmap = BitmapUtils.resamplePic(mContext,mTempPhotoPath);
 
-        // Resample the saved image to fit the ImageView
-        mResultsBitmap = BitmapUtils.resamplePic(this, mTempPhotoPath);
+            mResultsBitmap = Emojifier.detectFacesAndOverlayEmoji(mContext, mResultsBitmap);
 
-        mResultsBitmap = Emojifier.detectFacesAndOverlayEmoji(this,mResultsBitmap);
+            return mResultsBitmap;
 
-        // Set the new bitmap to the ImageView
-        mImageView.setImageBitmap(mResultsBitmap);
+        }
 
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            // Toggle Visibility of the views
+            mSaveFab.setVisibility(View.VISIBLE);
+            mShareFab.setVisibility(View.VISIBLE);
+            mClearFab.setVisibility(View.VISIBLE);
 
+            // Set the new bitmap to the ImageView
+            mImageView.setImageBitmap(bitmap);
+
+        }
     }
 
 
